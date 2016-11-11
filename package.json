@@ -1,0 +1,20 @@
+{
+  "name": "pdfreactor",
+  "version": "1.0.0",
+  "description": "A lambda service for converting React components to PDF",
+  "main": "handler.js",
+  "author": "Marcus Bernales <mboperator@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "eslint-plugin-react": "^6.6.0",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.1.0",
+    "eslint": "^3.9.1",
+    "rollup-plugin-commonjs": "^5.0.5",
+    "rollup-plugin-jsx": "^1.0.3",
+    "rollup-plugin-node-resolve": "^2.0.0"
+  }
+}
