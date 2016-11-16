@@ -2,6 +2,99 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var fs = _interopDefault(require('fs'));
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var main = createCommonjsModule(function (module) {
+'use strict';
+
+var fs$$1 = fs;
+
+module.exports = {
+  /*
+   * Main entry point into dotenv. Allows configuration before loading .env
+   * @param {Object} options - valid options: path ('.env'), encoding ('utf8')
+   * @returns {Boolean}
+  */
+  config: function (options) {
+    var path = '.env';
+    var encoding = 'utf8';
+    var silent = false;
+
+    if (options) {
+      if (options.silent) {
+        silent = options.silent;
+      }
+      if (options.path) {
+        path = options.path;
+      }
+      if (options.encoding) {
+        encoding = options.encoding;
+      }
+    }
+
+    try {
+      // specifying an encoding returns a string instead of a buffer
+      var parsedObj = this.parse(fs$$1.readFileSync(path, { encoding: encoding }));
+
+      Object.keys(parsedObj).forEach(function (key) {
+        process.env[key] = process.env[key] || parsedObj[key];
+      });
+
+      return parsedObj
+    } catch (e) {
+      if (!silent) {
+        console.error(e);
+      }
+      return false
+    }
+  },
+
+  /*
+   * Parses a string or buffer into an object
+   * @param {String|Buffer} src - source to be parsed
+   * @returns {Object}
+  */
+  parse: function (src) {
+    var obj = {};
+
+    // convert Buffers before splitting into lines and processing
+    src.toString().split('\n').forEach(function (line) {
+      // matching "KEY' and 'VAL' in 'KEY=VAL'
+      var keyValueArr = line.match(/^\s*([\w\.\-]+)\s*=\s*(.*)?\s*$/);
+      // matched?
+      if (keyValueArr != null) {
+        var key = keyValueArr[1];
+
+        // default undefined or missing values to empty string
+        var value = keyValueArr[2] ? keyValueArr[2] : '';
+
+        // expand newlines in quoted values
+        var len = value ? value.length : 0;
+        if (len > 0 && value.charAt(0) === '\"' && value.charAt(len - 1) === '\"') {
+          value = value.replace(/\\n/gm, '\n');
+        }
+
+        // remove any surrounding quotes and extra spaces
+        value = value.replace(/(^['"]|['"]$)/g, '').trim();
+
+        obj[key] = value;
+      }
+    });
+
+    return obj
+  }
+
+};
+
+module.exports.load = module.exports.config;
+});
+
 /* eslint-disable no-unused-vars */
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var propIsEnumerable = Object.prototype.propertyIsEnumerable;
@@ -17988,11 +18081,7 @@ Hello.propTypes = {
 const hello = (event, context, callback) => {
   const response = {
     statusCode: 200,
-    body: JSON.stringify({
-      message: 'Go Serverless v1.0! Your function executed successfully!',
-      html: server.renderToString(Hello({event: event})),
-      input: event,
-    }),
+    body:  server.renderToString(Hello({event: event})),
   };
 
   callback(null, response);

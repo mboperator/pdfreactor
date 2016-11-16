@@ -5,7 +5,12 @@
   "main": "handler.js",
   "author": "Marcus Bernales <mboperator@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "rollup --config rollup.config.js",
+    "deploy": "yarn build; serverless deploy"
+  },
   "dependencies": {
+    "dotenv": "^2.0.0",
     "eslint-plugin-react": "^6.6.0",
     "react": "^15.3.2",
     "react-dom": "^15.3.2"
