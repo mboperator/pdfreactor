@@ -5,6 +5,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var fs = _interopDefault(require('fs'));
+var childProcess = _interopDefault(require('child_process'));
+var path = _interopDefault(require('path'));
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -22,7 +24,7 @@ module.exports = {
    * @returns {Boolean}
   */
   config: function (options) {
-    var path = '.env';
+    var path$$1 = '.env';
     var encoding = 'utf8';
     var silent = false;
 
@@ -31,7 +33,7 @@ module.exports = {
         silent = options.silent;
       }
       if (options.path) {
-        path = options.path;
+        path$$1 = options.path;
       }
       if (options.encoding) {
         encoding = options.encoding;
@@ -40,7 +42,7 @@ module.exports = {
 
     try {
       // specifying an encoding returns a string instead of a buffer
-      var parsedObj = this.parse(fs$$1.readFileSync(path, { encoding: encoding }));
+      var parsedObj = this.parse(fs$$1.readFileSync(path$$1, { encoding: encoding }));
 
       Object.keys(parsedObj).forEach(function (key) {
         process.env[key] = process.env[key] || parsedObj[key];
@@ -15045,17 +15047,17 @@ function getParentInstance(inst) {
  * Simulates the traversal of a two-phase, capture/bubble event dispatch.
  */
 function traverseTwoPhase(inst, fn, arg) {
-  var path = [];
+  var path$$1 = [];
   while (inst) {
-    path.push(inst);
+    path$$1.push(inst);
     inst = inst._hostParent;
   }
   var i;
-  for (i = path.length; i-- > 0;) {
-    fn(path[i], false, arg);
+  for (i = path$$1.length; i-- > 0;) {
+    fn(path$$1[i], false, arg);
   }
-  for (i = 0; i < path.length; i++) {
-    fn(path[i], true, arg);
+  for (i = 0; i < path$$1.length; i++) {
+    fn(path$$1[i], true, arg);
   }
 }
 
@@ -18078,13 +18080,52 @@ const Hello = props => (
 Hello.propTypes = {
 };
 
-const hello = (event, context, callback) => {
-  const response = {
-    statusCode: 200,
-    body:  server.renderToString(Hello({event: event})),
-  };
+const readPdf = (filepath) => new Promise((resolve, reject) => {
+  fs.readFile(filepath, (err, data) => {
+    if (err) { reject(err); }
+    else { resolve(data); }
+  });
+});
 
-  callback(null, response);
+const writeFile = (filepath, contents) => new Promise((resolve, reject) => {
+  fs.writeFile(filepath, contents, err => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(filepath);
+    }
+  });
+});
+
+const createPdf = (filepath) => {
+  process.env.PATH = `${process.env.PATH}:${process.env.LAMBDA_TASK_ROOT}`;
+  const phantomPath = path.join(__dirname, 'bin', 'phantomjs');
+  const args = [path.join(__dirname, 'createPdf.js', filepath)];
+  return new Promise((resolve, reject) => {
+    childProcess.execFile(phantomPath, args, (err, stdout, stderr) => {
+      if (err || stderr) {
+        reject({
+          statusCode: 500,
+          body: err || stderr,
+        });
+      } else {
+        resolve({
+          statusCode: 200,
+          body: stdout,
+        });
+      }
+    });
+  });
+};
+
+const hello = (event, context, callback) => {
+  const html = server.renderToString(Hello({event: event}));
+  const outputPath = path.join(__dirname, 'static', 'hello.html');
+  writeFile(outputPath, html)
+    .then(createPdf)
+    .then(readPdf)
+    .then(pdf => callback(null, { statusCode: 200, pdf }))
+    .catch(e => callback(null, e));
 
   // Use this code if you don't use the http event with the LAMBDA-PROXY integration
   // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
