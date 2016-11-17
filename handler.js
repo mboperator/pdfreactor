@@ -18120,7 +18120,7 @@ const createPdf = (filepath) => {
 };
 
 const hello = (event, context, callback) => {
-  const html = server.renderToString(Hello({event: JSON.parse(event.body)}));
+  const html = server.renderToString(Hello({event: event.body}));
   const outputPath = '/tmp/hello.html';
   writeFile(outputPath, html)
     .then(createPdf)
