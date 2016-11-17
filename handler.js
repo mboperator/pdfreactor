@@ -18099,20 +18099,19 @@ const writeFile = (filepath, contents) => new Promise((resolve, reject) => {
 
 const createPdf = (filepath) => {
   process.env.PATH = `${process.env.PATH}:${process.env.LAMBDA_TASK_ROOT}`;
-  const phantomPath = path.join(__dirname, 'bin', 'phantomjs');
-  const args = [path.join(__dirname, 'createPdf.js', filepath)];
+  const phantomPath = path.join(__dirname, 'bin', 'phantomjs_osx');
+  const args = [path.join(__dirname, 'createPdf.js'), filepath];
+  console.log('GRABBING PHANTOM PATH');
   return new Promise((resolve, reject) => {
     childProcess.execFile(phantomPath, args, (err, stdout, stderr) => {
+      console.log('EXECUTING PHANTOM');
       if (err || stderr) {
         reject({
           statusCode: 500,
           body: err || stderr,
         });
       } else {
-        resolve({
-          statusCode: 200,
-          body: stdout,
-        });
+        resolve(stdout);
       }
     });
   });
@@ -18120,11 +18119,12 @@ const createPdf = (filepath) => {
 
 const hello = (event, context, callback) => {
   const html = server.renderToString(Hello({event: event}));
-  const outputPath = path.join(__dirname, 'static', 'hello.html');
+  const outputPath = 'hello.html';
   writeFile(outputPath, html)
     .then(createPdf)
+    // Upload to S3
     .then(readPdf)
-    .then(pdf => callback(null, { statusCode: 200, pdf }))
+    .then(pdf => callback(null, { statusCode: 200, body: pdf }))
     .catch(e => callback(null, e));
 
   // Use this code if you don't use the http event with the LAMBDA-PROXY integration
