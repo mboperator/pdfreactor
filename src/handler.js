@@ -46,7 +46,7 @@ const createPdf = (filepath) => {
 };
 
 export const hello = (event, context, callback) => {
-  const html = ReactDOM.renderToString(<Hello event={JSON.parse(event.body)}/>);
+  const html = ReactDOM.renderToString(<Hello event={event.body}/>);
   const outputPath = '/tmp/hello.html';
   writeFile(outputPath, html)
     .then(createPdf)

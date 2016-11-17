@@ -18120,11 +18120,10 @@ const createPdf = (filepath) => {
 };
 
 const hello = (event, context, callback) => {
-  const html = server.renderToString(Hello({event: event}));
-  const outputPath = 'hello.html';
+  const html = server.renderToString(Hello({event: JSON.parse(event.body)}));
+  const outputPath = '/tmp/hello.html';
   writeFile(outputPath, html)
     .then(createPdf)
-    // Upload to S3
     .then(readPdf)
     .then(pdf => callback(null, { statusCode: 200, body: pdf }))
     .catch(e => callback(null, e));
