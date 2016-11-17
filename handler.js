@@ -18081,6 +18081,7 @@ Hello.propTypes = {
 };
 
 const readPdf = (filepath) => new Promise((resolve, reject) => {
+  console.log('pdfreactor::reading', filepath);
   fs.readFile(filepath, (err, data) => {
     if (err) { reject(err); }
     else { resolve(data); }
@@ -18088,6 +18089,7 @@ const readPdf = (filepath) => new Promise((resolve, reject) => {
 });
 
 const writeFile = (filepath, contents) => new Promise((resolve, reject) => {
+  console.log('pdfreactor::writing', filepath);
   fs.writeFile(filepath, contents, err => {
     if (err) {
       reject(err);
@@ -18101,10 +18103,10 @@ const createPdf = (filepath) => {
   process.env.PATH = `${process.env.PATH}:${process.env.LAMBDA_TASK_ROOT}`;
   const phantomPath = path.join(__dirname, 'bin', 'phantomjs_osx');
   const args = [path.join(__dirname, 'createPdf.js'), filepath];
-  console.log('GRABBING PHANTOM PATH');
+  console.log('pdfreactor::creating_pdf');
   return new Promise((resolve, reject) => {
     childProcess.execFile(phantomPath, args, (err, stdout, stderr) => {
-      console.log('EXECUTING PHANTOM');
+      console.log('pdfreactor::started_phantom');
       if (err || stderr) {
         reject({
           statusCode: 500,
