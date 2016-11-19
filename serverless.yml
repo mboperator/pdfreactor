@@ -51,6 +51,7 @@ functions:
     handler: handler.hello
     events:
       - http: POST generate/hello_world
+      - http: GET generate/hello_world
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

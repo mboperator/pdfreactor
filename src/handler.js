@@ -1,10 +1,12 @@
-import 'dotenv';
+import dotenv from 'dotenv';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import childProcess from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import Hello from './components/Hello';
+
+dotenv.load();
 
 const readPdf = (filepath) => new Promise((resolve, reject) => {
   console.log('pdfreactor::reading', filepath);
@@ -27,8 +29,10 @@ const writeFile = (filepath, contents) => new Promise((resolve, reject) => {
 
 const createPdf = (filepath) => {
   process.env.PATH = `${process.env.PATH}:${process.env.LAMBDA_TASK_ROOT}`;
-  const phantomPath = path.join(__dirname, 'bin', 'phantomjs');
+  const phantomBin = (process.env.STAGE === 'development') ? 'phantomjs_osx' : 'phantomjs';
+  const phantomPath = path.join(__dirname, 'bin', phantomBin);
   const args = [path.join(__dirname, 'createPdf.js'), filepath];
+
   console.log('pdfreactor::creating_pdf');
   return new Promise((resolve, reject) => {
     childProcess.execFile(phantomPath, args, (err, stdout, stderr) => {
