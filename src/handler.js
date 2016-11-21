@@ -50,8 +50,15 @@ const createPdf = (filepath) => {
 };
 
 export const hello = (event, context, callback) => {
-  const html = ReactDOM.renderToString(<Hello event={event.body}/>);
+  const props = JSON.parse(event.body);
+  const html = ReactDOM.renderToString(
+    <Hello
+      data={props.data}
+      page={props.page}
+    />
+  );
   const outputPath = '/tmp/hello.html';
+
   writeFile(outputPath, html)
     .then(createPdf)
     .then(readPdf)
@@ -60,4 +67,9 @@ export const hello = (event, context, callback) => {
 
   // Use this code if you don't use the http event with the LAMBDA-PROXY integration
   // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
+};
+
+export const helloHtml = (event, context, callback) => {
+  const html = ReactDOM.renderToString(<Hello event={event.body}/>);
+  callback(null, { statusCode: 200, body: html });
 };
