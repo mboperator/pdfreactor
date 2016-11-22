@@ -4,15 +4,35 @@ import ReactDOM from 'react-dom/server';
 import childProcess from 'child_process';
 import path from 'path';
 import fs from 'fs';
+import s3 from 'aws-sdk/clients/s3';
 import Hello from './components/Hello';
 
 dotenv.load();
+const s3Adapter = new s3();
+
+const createKey = filepath => filepath.split('/')[1];
+
+const uploadToS3 = ({ filepath, data }) => new Promise((resolve, reject) => {
+  const key = createKey(filepath);
+  console.log('pdfreactor::uploading to s3');
+
+  s3Adapter.putObject({
+    Bucket: 'pdf-export-bucket',
+    Key: key,
+    ACL: 'authenticated-read',
+    Body: data,
+    ContentEncoding: 'application/pdf',
+  }, (err, data) => {
+    if (err) { reject(err); }
+    else { resolve(data); }
+  });
+});
 
 const readPdf = (filepath) => new Promise((resolve, reject) => {
   console.log('pdfreactor::reading', filepath);
   fs.readFile(filepath, (err, data) => {
     if (err) { reject(err); }
-    else { resolve(data); }
+    else { resolve({ filepath, data }); }
   });
 });
 
@@ -55,6 +75,7 @@ export const hello = (event, context, callback) => {
   writeFile(outputPath, html)
     .then(createPdf)
     .then(readPdf)
+    .then(uploadToS3)
     .then(pdf => callback(null, { statusCode: 200, body: pdf }))
     .catch(e => callback(null, e));
 

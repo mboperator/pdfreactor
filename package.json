@@ -10,6 +10,7 @@
     "deploy": "yarn build; serverless deploy"
   },
   "dependencies": {
+    "aws-sdk": "^2.7.6",
     "dotenv": "^2.0.0",
     "eslint-plugin-react": "^6.6.0",
     "react": "^15.3.2",
