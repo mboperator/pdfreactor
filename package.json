@@ -6,6 +6,7 @@
   "author": "Marcus Bernales <mboperator@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "start": "yarn build; serverless offline",
     "build": "rollup --config rollup.config.js",
     "deploy": "yarn build; serverless deploy"
   },
@@ -14,12 +15,14 @@
     "dotenv": "^2.0.0",
     "eslint-plugin-react": "^6.6.0",
     "react": "^15.3.2",
-    "react-dom": "^15.3.2"
+    "react-dom": "^15.3.2",
+    "uuid": "^3.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.0",
     "eslint": "^3.9.1",
     "rollup-plugin-commonjs": "^5.0.5",
+    "rollup-plugin-json": "^2.0.2",
     "rollup-plugin-jsx": "^1.0.3",
     "rollup-plugin-node-resolve": "^2.0.0",
     "serverless-offline": "^3.3.2"

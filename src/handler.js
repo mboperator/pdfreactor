@@ -4,27 +4,32 @@ import ReactDOM from 'react-dom/server';
 import childProcess from 'child_process';
 import path from 'path';
 import fs from 'fs';
-import s3 from 'aws-sdk/clients/s3';
+import uuid from 'uuid';
+import aws from 'aws-sdk';
 import Hello from './components/Hello';
 
 dotenv.load();
-const s3Adapter = new s3();
+const s3Adapter = new aws.S3();
 
-const createKey = filepath => filepath.split('/')[1];
+const S3_BUCKET = process.env.S3_BUCKET || 'pdf-export-bucket';
+const S3_BASEURL = process.env.S3_BASEURL || 's3-us-west-2.amazonaws.com';
+
+const createKey = filepath => `${filepath.split('/')[1]}-${uuid.v4()}.pdf`;
+const getS3Url = key => `https://${S3_BASEURL}/${S3_BUCKET}/${key}`;
 
 const uploadToS3 = ({ filepath, data }) => new Promise((resolve, reject) => {
   const key = createKey(filepath);
   console.log('pdfreactor::uploading to s3');
 
   s3Adapter.putObject({
-    Bucket: 'pdf-export-bucket',
+    Bucket: S3_BUCKET,
     Key: key,
-    ACL: 'authenticated-read',
+    ACL: 'public-read',
     Body: data,
     ContentEncoding: 'application/pdf',
   }, (err, data) => {
     if (err) { reject(err); }
-    else { resolve(data); }
+    else { resolve({ key, url: getS3Url(key) }); }
   });
 });
 
