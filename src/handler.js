@@ -54,9 +54,9 @@ const writeFile = (filepath, contents) => new Promise((resolve, reject) => {
 
 const createPdf = (filepath) => {
   process.env.PATH = `${process.env.PATH}:${process.env.LAMBDA_TASK_ROOT}`;
-  const phantomBin = (process.env.STAGE === 'development') ? 'phantomjs_osx' : 'phantomjs';
-  const phantomPath = path.join(__dirname, 'bin', phantomBin);
-  const args = [path.join(__dirname, 'createPdf.js'), filepath];
+  const phantomBin = (process.env.STAGE === 'development') ? 'phantomjs_osx' : 'phantomjs_osx';
+  const phantomPath = path.join('bin', phantomBin);
+  const args = [path.join('createPdf.js'), filepath];
 
   console.log('pdfreactor::creating_pdf');
   return new Promise((resolve, reject) => {

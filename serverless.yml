@@ -57,7 +57,8 @@ exclude:
 
 functions:
   hello:
-    handler: handler.hello
+    handler: dist/handler.hello
+    timeout: 60
     events:
       - http: POST generate/hello_world
       - http: GET generate/hello_world
