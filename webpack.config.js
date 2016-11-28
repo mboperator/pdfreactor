@@ -22,6 +22,9 @@ module.exports = {
   node: {
     __dirname: true,
   },
+  externals: {
+    'aws-sdk': 'aws-sdk',
+  },
   output: {
     path: path.join(__dirname, 'dist'),
     library: 'handler',

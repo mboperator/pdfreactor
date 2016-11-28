@@ -8,7 +8,7 @@
   "scripts": {
     "start": "yarn build; serverless offline",
     "build": "webpack --config webpack.config.js",
-    "deploy": "yarn build; serverless deploy"
+    "deploy": "yarn build; ./deploy.sh"
   },
   "dependencies": {
     "aws-sdk": "^2.7.6",

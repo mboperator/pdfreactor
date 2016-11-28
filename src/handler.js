@@ -27,9 +27,14 @@ const uploadToS3 = ({ filepath, data }) => new Promise((resolve, reject) => {
     ACL: 'public-read',
     Body: data,
     ContentEncoding: 'application/pdf',
-  }, (err, data) => {
-    if (err) { reject(err); }
-    else { resolve({ key, url: getS3Url(key) }); }
+  }, (err, result) => {
+    if (err) {
+      console.log('pdfreactor::upload error', JSON.stringify(err));
+      reject(err);
+    } else {
+      console.log('pdfreactor::upload success');
+      resolve({ key, url: getS3Url(key), result });
+    }
   });
 });
 
@@ -54,7 +59,7 @@ const writeFile = (filepath, contents) => new Promise((resolve, reject) => {
 
 const createPdf = (filepath) => {
   process.env.PATH = `${process.env.PATH}:${process.env.LAMBDA_TASK_ROOT}`;
-  const phantomBin = (process.env.STAGE === 'development') ? 'phantomjs_osx' : 'phantomjs';
+  const phantomBin = 'phantomjs';
   const phantomPath = path.join('bin', phantomBin);
   const args = [path.join('createPdf.js'), filepath];
 
@@ -82,7 +87,7 @@ export const hello = (event, context, callback) => {
     .then(readPdf)
     .then(uploadToS3)
     .then(pdf => callback(null, { statusCode: 200, body: pdf }))
-    .catch(e => callback(null, e));
+    .catch(e => callback(null, { statusCode: 500, body: e }));
 
   // Use this code if you don't use the http event with the LAMBDA-PROXY integration
   // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
