@@ -86,8 +86,8 @@ export const hello = (event, context, callback) => {
     .then(createPdf)
     .then(readPdf)
     .then(uploadToS3)
-    .then(pdf => callback(null, { statusCode: 200, body: pdf }))
-    .catch(e => callback(null, { statusCode: 500, body: e }));
+    .then(pdf => callback(null, { statusCode: 200, body: JSON.stringify(pdf) }))
+    .catch(e => callback(null, { statusCode: 500, body: JSON.stringify(e) }));
 
   // Use this code if you don't use the http event with the LAMBDA-PROXY integration
   // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
