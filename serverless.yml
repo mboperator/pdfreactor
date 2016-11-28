@@ -53,6 +53,7 @@ iamRoleStatements:
 exclude:
   - .env
   - phantom_osx
+  - src
 #  artifact: my-service-code.zip
 
 functions:

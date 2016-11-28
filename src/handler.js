@@ -54,7 +54,7 @@ const writeFile = (filepath, contents) => new Promise((resolve, reject) => {
 
 const createPdf = (filepath) => {
   process.env.PATH = `${process.env.PATH}:${process.env.LAMBDA_TASK_ROOT}`;
-  const phantomBin = (process.env.STAGE === 'development') ? 'phantomjs_osx' : 'phantomjs_osx';
+  const phantomBin = (process.env.STAGE === 'development') ? 'phantomjs_osx' : 'phantomjs';
   const phantomPath = path.join('bin', phantomBin);
   const args = [path.join('createPdf.js'), filepath];
 
