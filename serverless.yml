@@ -30,27 +30,13 @@ provider:
     - Effect: "Allow"
       Action:
         - "s3:PutObject"
-      Resource:
-        Fn::Join:
-          - ""
-          - - "arn:aws:s3:::"
-            - "Ref" : "pdfExportBucket"
-    - Effect: "Allow"
-      Action:
         - "s3:PutObjectAcl"
-      Resource:
-        Fn::Join:
-          - ""
-          - - "arn:aws:s3:::"
-            - "Ref" : "pdfExportBucket"
-    - Effect: "Allow"
-      Action:
         - "s3:GetObject"
+        - "s3:GetObjectAcl"
+        - "s3:ListBucket"
       Resource:
-        Fn::Join:
-          - ""
-          - - "arn:aws:s3:::"
-            - "Ref" : "pdfExportBucket"
+        - "arn:aws:s3:::pdf-export-bucket"
+        - "arn:aws:s3:::pdf-export-bucket/*"
 
 # you can add packaging information here
 #package:
